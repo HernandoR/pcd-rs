@@ -1,5 +1,5 @@
 [project]
-name = "pcd-rs"
+name = "pcl-rustic"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -10,16 +10,18 @@ requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
-pcd-rs = "pcd_rs:main"
+pcl-rustic = "pcl_rustic:main"
 
 [tool.maturin]
-module-name = "pcd_rs._core" # python module name
-python-packages = ["pcd_rs"]
+features = ["pyo3/extension-module"]
+module-name = "pcl_rustic._core" # python module name
+python-packages = ["pcl_rustic"]
 python-source = "python"
+manifest-path = "crates/pcl_rustic_pybind/Cargo.toml"
 
 
 [tool.uv]
-cache-keys = [{ file = "pyproject.toml" }, { file = "src/**/*.rs" }, { file = "Cargo.toml" }, { file = "Cargo.lock" }]
+cache-keys = [{ file = "pyproject.toml" }, { file = "crates/**/*.rs" }, { file = "crates/**/Cargo.toml" }, { file = "Cargo.lock" },]
 
 [build-system]
 requires = ["maturin>=1.0,<2.0"]

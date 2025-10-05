@@ -1,0 +1,11 @@
+[package]
+name = "pcl_rustic_downsample"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "pcl_rustic_downsample"
+crate-type = ["rlib"]
+
+[dependencies]
+pcl_rustic_core = { path = "../pcl_rustic_core" }

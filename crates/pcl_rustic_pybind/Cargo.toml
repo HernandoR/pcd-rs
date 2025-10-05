@@ -1,0 +1,14 @@
+[package]
+name = "pcl_rustic_pybind"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "pcl_rustic_pybind"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.22.4", features = ["extension-module", "abi3-py39"] }
+pcl_rustic_core = { path = "../pcl_rustic_core" }
+pcl_rustic_io = { path = "../pcl_rustic_io" }
+pcl_rustic_downsample = { path = "../pcl_rustic_downsample" }
