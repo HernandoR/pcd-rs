@@ -8,3 +8,4 @@ name = "pcl_rustic_core"
 crate-type = ["rlib"]
 
 [dependencies]
+las = { version = ">=0.9", features = ["laz-parallel"] }
