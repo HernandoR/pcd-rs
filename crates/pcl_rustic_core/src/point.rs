@@ -1,9 +1,8 @@
+use ndarray::Array2;
 use std::fmt;
-use std::ops::{Add, Sub, Mul, Div};
-use ndarray::arr2;
 
 /// A point in a point cloud with required and optional attributes
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Point {
     // Required attributes
     pub x: f32,
@@ -18,6 +17,7 @@ pub struct Point {
     pub intensity: Option<f32>,
     pub ring_id: Option<u16>,
     pub time_offset: Option<f64>,
+    pub extra_attributes: std::collections::HashMap<String, f32>,
 }
 
 impl Point {
@@ -34,7 +34,40 @@ impl Point {
             intensity: None,
             ring_id: None,
             time_offset: None,
+            extra_attributes: std::collections::HashMap::<String, f32>::new(),
         }
+    }
+
+    pub fn fields(&self) -> Vec<String> {
+        let mut attrs: Vec<String> = Vec::with_capacity(8 + self.extra_attributes.len());
+        attrs.push("x".to_string());
+        attrs.push("y".to_string());
+        if self.z.is_some() {
+            attrs.push("z".to_string());
+        }
+        if self.r.is_some() && self.g.is_some() && self.b.is_some() {
+            attrs.push("r".to_string());
+            attrs.push("g".to_string());
+            attrs.push("b".to_string());
+        }
+        if self.a.is_some() {
+            attrs.push("a".to_string());
+        }
+        if self.intensity.is_some() {
+            attrs.push("intensity".to_string());
+        }
+        if self.ring_id.is_some() {
+            attrs.push("ring_id".to_string());
+        }
+        if self.time_offset.is_some() {
+            attrs.push("time_offset".to_string());
+        }
+        if !self.extra_attributes.is_empty() {
+            for key in self.extra_attributes.keys() {
+                attrs.push(key.clone());
+            }
+        }
+        attrs
     }
 
     /// Create a new 3D point with x, y, z coordinates
@@ -50,11 +83,14 @@ impl Point {
             intensity: None,
             ring_id: None,
             time_offset: None,
+            extra_attributes: std::collections::HashMap::<String, f32>::new(),
         }
     }
 
-    pub fn transform(&self, a2b: &arr2<f32; 4, 4>) -> Self {
-        let point_vec = arr2(&[[self.x], [self.y], [self.z.unwrap_or(0.0)], [1.0]]);
+    pub fn transform(&self, a2b: &Array2<f32>) -> Self {
+        let point_vec =
+            Array2::from_shape_vec((4, 1), vec![self.x, self.y, self.z.unwrap_or(0.0), 1.0])
+                .unwrap();
         let transformed = a2b.dot(&point_vec);
         Self {
             x: transformed[[0, 0]],
@@ -67,6 +103,7 @@ impl Point {
             intensity: self.intensity,
             ring_id: self.ring_id,
             time_offset: self.time_offset,
+            extra_attributes: self.extra_attributes.clone(),
         }
     }
 
@@ -151,8 +188,6 @@ impl Point {
     pub fn has_color(&self) -> bool {
         self.r.is_some() && self.g.is_some() && self.b.is_some()
     }
-
-
 }
 
 impl fmt::Display for Point {
@@ -183,84 +218,20 @@ impl fmt::Display for Point {
     }
 }
 
-impl Add for Point {
-    type Output = Self;
-
-    fn add(self, other: Self) -> Self {
+impl Default for Point {
+    fn default() -> Self {
         Self {
-            x: self.x + other.x,
-            y: self.y + other.y,
-            z: match (self.z, other.z) {
-                (Some(z1), Some(z2)) => Some(z1 + z2),
-                _ => self.z,
-            },
-            r: self.r,
-            g: self.g,
-            b: self.b,
-            a: self.a,
-            intensity: self.intensity,
-            ring_id: self.ring_id,
-            time_offset: self.time_offset,
-        }
-    }
-}
-
-impl Sub for Point {
-    type Output = Self;
-
-    fn sub(self, other: Self) -> Self {
-        Self {
-            x: self.x - other.x,
-            y: self.y - other.y,
-            z: match (self.z, other.z) {
-                (Some(z1), Some(z2)) => Some(z1 - z2),
-                _ => self.z,
-            },
-            r: self.r,
-            g: self.g,
-            b: self.b,
-            a: self.a,
-            intensity: self.intensity,
-            ring_id: self.ring_id,
-            time_offset: self.time_offset,
-        }
-    }
-}
-
-impl Mul<f32> for Point {
-    type Output = Self;
-
-    fn mul(self, scalar: f32) -> Self {
-        Self {
-            x: self.x * scalar,
-            y: self.y * scalar,
-            z: self.z.map(|z| z * scalar),
-            r: self.r,
-            g: self.g,
-            b: self.b,
-            a: self.a,
-            intensity: self.intensity.map(|i| i * scalar),
-            ring_id: self.ring_id,
-            time_offset: self.time_offset,
-        }
-    }
-}
-
-impl Div<f32> for Point {
-    type Output = Self;
-
-    fn div(self, scalar: f32) -> Self {
-        Self {
-            x: self.x / scalar,
-            y: self.y / scalar,
-            z: self.z.map(|z| z / scalar),
-            r: self.r,
-            g: self.g,
-            b: self.b,
-            a: self.a,
-            intensity: self.intensity.map(|i| i / scalar),
-            ring_id: self.ring_id,
-            time_offset: self.time_offset,
+            x: 0.0,
+            y: 0.0,
+            z: None,
+            r: None,
+            g: None,
+            b: None,
+            a: None,
+            intensity: None,
+            ring_id: None,
+            time_offset: None,
+            extra_attributes: std::collections::HashMap::<String, f32>::new(),
         }
     }
 }

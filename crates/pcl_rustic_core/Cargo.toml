@@ -9,3 +9,6 @@ crate-type = ["rlib"]
 
 [dependencies]
 las = { version = ">=0.9", features = ["laz-parallel"] }
+ndarray = { version = "0.16.1", features = ["blas"] }
+
+[features]
