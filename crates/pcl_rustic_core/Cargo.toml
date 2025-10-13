@@ -8,3 +8,4 @@ name = "pcl_rustic_core"
 crate-type = ["rlib"]
 
 [dependencies]
+polars = "0.51"
